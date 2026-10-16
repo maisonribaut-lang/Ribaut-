@@ -40,8 +40,8 @@ jobs:
         run: |
           sed -i 's/for(SeekBar b:new SeekBar/for(SeekBar seek:new SeekBar/; s/)b.setOnSeekBarChangeListener(sl);/)seek.setOnSeekBarChangeListener(sl);/' app/src/main/java/com/ribaut/watchdesigner/MainActivity.java
 
-      - name: Build phone and watch APKs
-        run: gradle --no-daemon :app:assembleDebug :wear:assembleDebug
+      - name: Build phone, watch companion and WFF APKs
+        run: gradle --no-daemon :app:assembleDebug :wear:assembleDebug :watchface:assembleDebug
 
       - name: Upload phone APK
         uses: actions/upload-artifact@v4
@@ -55,4 +55,11 @@ jobs:
         with:
           name: Ribaut-Watch-Installer-Watch8-V1
           path: wear/build/outputs/apk/debug/wear-debug.apk
+          if-no-files-found: error
+
+      - name: Upload Watch Face Format test APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ribaut-WFF-Test
+          path: watchface/build/outputs/apk/debug/watchface-debug.apk
           if-no-files-found: error
