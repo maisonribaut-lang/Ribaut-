@@ -7,11 +7,11 @@ android {
     compileSdk 36
 
     defaultConfig {
-        applicationId 'com.ribaut.watchinstaller'
+        applicationId 'com.ribaut.watchdesigner'
         minSdk 36
         targetSdk 36
-        versionCode 1
-        versionName '1.0'
+        versionCode 2
+        versionName '1.1'
     }
 
     buildTypes {
@@ -28,4 +28,5 @@ android {
 
 dependencies {
     implementation 'androidx.wear.watchfacepush:watchfacepush:1.0.0'
+    implementation 'com.google.android.gms:play-services-wearable:20.0.1'
 }
