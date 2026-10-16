@@ -26,22 +26,29 @@ jobs:
           echo "/usr/local/lib/android/sdk/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
           echo "/usr/local/lib/android/sdk/platform-tools" >> "$GITHUB_PATH"
 
-      - name: Install Android platform
+      - name: Install Android platforms
         run: |
           yes | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --licenses >/dev/null || true
-          /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+          /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-35" "platforms;android-36" "build-tools;35.0.0" "build-tools;36.0.0"
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
 
-      - name: Build debug APK
-        run: gradle --no-daemon assembleDebug
+      - name: Build phone and watch APKs
+        run: gradle --no-daemon :app:assembleDebug :wear:assembleDebug
 
-      - name: Upload APK
+      - name: Upload phone APK
         uses: actions/upload-artifact@v4
         with:
           name: Ribaut-Watch-Designer-V1
           path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+
+      - name: Upload Watch 8 companion APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ribaut-Watch-Installer-Watch8-V1
+          path: wear/build/outputs/apk/debug/wear-debug.apk
           if-no-files-found: error
