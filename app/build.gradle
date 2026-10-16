@@ -24,3 +24,17 @@ android {
 dependencies {
     implementation 'com.google.android.gms:play-services-wearable:20.0.1'
 }
+
+tasks.register('wireWatchLink') {
+    doLast {
+        def f = file('src/main/java/com/ribaut/watchdesigner/MainActivity.java')
+        def oldText = 'install.setOnClickListener(x->new AlertDialog.Builder(this).setTitle("Installation Watch 8").setMessage("La liaison d\'installation vers la montre est en cours d\'intégration sur cette branche de test.").setPositiveButton("OK",null).show());'
+        def newText = 'install.setOnClickListener(x->WatchLink.test(this));'
+        def text = f.getText('UTF-8')
+        if (text.contains(oldText)) {
+            f.write(text.replace(oldText, newText), 'UTF-8')
+        }
+    }
+}
+
+tasks.named('preBuild').configure { dependsOn tasks.named('wireWatchLink') }
