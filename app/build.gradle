@@ -10,8 +10,8 @@ android {
         applicationId 'com.ribaut.watchdesigner'
         minSdk 26
         targetSdk 35
-        versionCode 1
-        versionName '1.0'
+        versionCode 2
+        versionName '1.1'
     }
 
     buildTypes {
@@ -19,4 +19,8 @@ android {
             minifyEnabled false
         }
     }
+}
+
+dependencies {
+    implementation 'com.google.android.gms:play-services-wearable:20.0.1'
 }
