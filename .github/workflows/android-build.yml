@@ -18,6 +18,9 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Install Android platform
         run: |
           yes | sdkmanager --licenses >/dev/null || true
@@ -36,3 +39,4 @@ jobs:
         with:
           name: Ribaut-Watch-Designer-V1
           path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
