@@ -36,6 +36,10 @@ jobs:
         with:
           gradle-version: '8.11.1'
 
+      - name: Fix Java variable collision in test branch
+        run: |
+          sed -i 's/for(SeekBar b:new SeekBar/for(SeekBar seek:new SeekBar/; s/)b.setOnSeekBarChangeListener(sl);/)seek.setOnSeekBarChangeListener(sl);/' app/src/main/java/com/ribaut/watchdesigner/MainActivity.java
+
       - name: Build phone and watch APKs
         run: gradle --no-daemon :app:assembleDebug :wear:assembleDebug
 
