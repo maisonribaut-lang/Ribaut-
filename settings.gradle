@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "RibautWatchDesigner"
 include ':app'
+include ':wear'
