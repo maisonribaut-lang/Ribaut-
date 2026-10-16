@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WatchFace width="450" height="450">
+    <Scene backgroundColor="#101014">
+        <PartText x="0" y="72" width="450" height="70">
+            <Text align="CENTER">
+                <Font family="SYNC_TO_DEVICE" size="34" color="#FFFFFF">RIBAUT</Font>
+            </Text>
+        </PartText>
+        <AnalogClock x="0" y="0" width="450" height="450">
+            <HourHand resource="hour_hand" x="215" y="105" width="20" height="120" pivotX="0.5" pivotY="1.0" />
+            <MinuteHand resource="minute_hand" x="217" y="75" width="16" height="150" pivotX="0.5" pivotY="1.0" />
+            <SecondHand resource="second_hand" x="222" y="60" width="6" height="165" pivotX="0.5" pivotY="1.0" />
+        </AnalogClock>
+        <PartText x="0" y="300" width="450" height="60">
+            <Text align="CENTER">
+                <Font family="SYNC_TO_DEVICE" size="28" color="#FFFFFF"><Template><![CDATA[%02d:%02d]]><Parameter expression="[HOUR_0_23]"/><Parameter expression="[MINUTE]"/></Template></Font>
+            </Text>
+        </PartText>
+    </Scene>
+</WatchFace>
