@@ -1,0 +1,16 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-feature android:name="android.hardware.type.watch" android:required="true" />
+    <application
+        android:label="Ribaut Test"
+        android:hasCode="false">
+        <property
+            android:name="com.google.wear.watchface.format.version"
+            android:value="1" />
+        <meta-data
+            android:name="com.google.android.wearable.watchface.preview"
+            android:resource="@drawable/preview" />
+        <meta-data
+            android:name="com.google.android.wearable.watchface.xml"
+            android:resource="@xml/watch_face_info" />
+    </application>
+</manifest>
