@@ -29,9 +29,9 @@ public class WatchMessageService extends WearableListenerService {
     @Override
     public void onChannelOpened(ChannelClient.Channel channel) {
         if (!CHANNEL_PATH.equals(channel.getPath())) return;
-        Wearable.getChannelClient(this).getInputStream(channel).addOnSuccessListener(input -> {
-            new Thread(() -> receiveWatchFace(channel, input)).start();
-        });
+        Wearable.getChannelClient(this).getInputStream(channel).addOnSuccessListener(input ->
+            new Thread(() -> receiveWatchFace(channel, input)).start()
+        );
     }
 
     private void receiveWatchFace(ChannelClient.Channel channel, InputStream input) {
@@ -51,7 +51,7 @@ public class WatchMessageService extends WearableListenerService {
             getSharedPreferences("ribaut_watch_link", MODE_PRIVATE).edit()
                 .putString("incoming_wff_error", String.valueOf(e)).apply();
         } finally {
-            Wearable.getChannelClient(this).close(channel);
+            Wearable.getChannelClient(this).close(channel.getToken());
         }
     }
 }
