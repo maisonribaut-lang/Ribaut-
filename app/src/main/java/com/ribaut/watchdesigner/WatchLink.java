@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 
 public final class WatchLink {
     private static final String INSTALL_PATH = "/ribaut/watchdesigner/install-default";
+    private static final String PACKAGE_PATH = "/ribaut/watchdesigner/watchface-package";
     private static final String TOKEN_PATH = "/ribaut/watchdesigner/watchface-token";
     private static final String CHANNEL_PATH = "/ribaut/watchdesigner/watchface-apk";
     private WatchLink() {}
@@ -33,9 +34,13 @@ public final class WatchLink {
     }
 
     /** Sends a freshly generated and validated WFF APK to the watch. */
-    public static void installGenerated(Activity activity, File apk, String validationToken) {
+    public static void installGenerated(Activity activity, File apk, String packageName, String validationToken) {
         if (apk == null || !apk.isFile() || apk.length() == 0L) {
             show(activity, "Cadran non généré", "Le fichier du cadran est absent ou vide.");
+            return;
+        }
+        if (packageName == null || !packageName.startsWith(activity.getPackageName() + ".watchfacepush.")) {
+            show(activity, "Cadran invalide", "Le nom du package WFF est absent ou incorrect.");
             return;
         }
         if (validationToken == null || validationToken.trim().isEmpty()) {
@@ -50,10 +55,13 @@ public final class WatchLink {
                     return;
                 }
                 Node node = nodes.get(0);
+                byte[] pkg = packageName.trim().getBytes(StandardCharsets.UTF_8);
                 byte[] token = validationToken.trim().getBytes(StandardCharsets.UTF_8);
-                Wearable.getMessageClient(activity).sendMessage(node.getId(), TOKEN_PATH, token)
-                    .addOnSuccessListener(id -> sendApk(activity, node, apk))
-                    .addOnFailureListener(e -> show(activity, "Échec validation", "Le jeton du cadran n'a pas pu être envoyé.\n\n" + e.getMessage()));
+                Wearable.getMessageClient(activity).sendMessage(node.getId(), PACKAGE_PATH, pkg)
+                    .addOnSuccessListener(pkgId -> Wearable.getMessageClient(activity).sendMessage(node.getId(), TOKEN_PATH, token)
+                        .addOnSuccessListener(tokenId -> sendApk(activity, node, apk))
+                        .addOnFailureListener(e -> show(activity, "Échec validation", "Le jeton du cadran n'a pas pu être envoyé.\n\n" + e.getMessage())))
+                    .addOnFailureListener(e -> show(activity, "Échec transfert", "Le nom du cadran n'a pas pu être envoyé.\n\n" + e.getMessage()));
             })
             .addOnFailureListener(e -> show(activity, "Échec Wear OS", "Impossible d'interroger la montre.\n\n" + e.getMessage()));
     }
