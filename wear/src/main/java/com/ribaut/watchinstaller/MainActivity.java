@@ -51,7 +51,7 @@ public class MainActivity extends Activity {
         root.addView(status, statusParams);
 
         TextView info = new TextView(this);
-        info.setText("Cette application est la partie montre de Ribaut Watch Designer.\n\nLe transfert depuis le téléphone sera relié au bouton « Installer sur ma Watch 8 ».");
+        info.setText("Cette application installe le cadran Ribaut validé et tente de l’activer automatiquement.");
         info.setTextColor(Color.LTGRAY);
         info.setTextSize(12);
         info.setGravity(Gravity.CENTER);
@@ -63,7 +63,26 @@ public class MainActivity extends Activity {
 
         if (checkSelfPermission(SET_ACTIVE_PERMISSION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{SET_ACTIVE_PERMISSION}, 100);
+        } else {
+            activateWatchFace();
         }
+    }
+
+    private void activateWatchFace() {
+        status.setText("Recherche du cadran Ribaut…");
+        WatchFaceActivator.activate(this, new WatchFaceActivator.Callback() {
+            @Override
+            public void onActivated(String packageName, String slotId) {
+                status.setText("Cadran Ribaut activé");
+                status.setTextColor(Color.rgb(126, 211, 145));
+            }
+
+            @Override
+            public void onError(String message) {
+                status.setText("Cadran installé — activation : " + message);
+                status.setTextColor(Color.rgb(255, 196, 92));
+            }
+        });
     }
 
     @Override
@@ -71,9 +90,10 @@ public class MainActivity extends Activity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 100) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                status.setText("Autorisation d’activation accordée");
+                status.setText("Autorisation accordée — activation…");
+                activateWatchFace();
             } else {
-                status.setText("Compagnon installé — activation manuelle possible");
+                status.setText("Cadran installé — activation manuelle possible");
                 status.setTextColor(Color.rgb(255, 196, 92));
             }
         }
