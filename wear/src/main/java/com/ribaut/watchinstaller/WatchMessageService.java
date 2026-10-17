@@ -51,7 +51,7 @@ public class WatchMessageService extends WearableListenerService {
             getSharedPreferences("ribaut_watch_link", MODE_PRIVATE).edit()
                 .putString("incoming_wff_error", String.valueOf(e)).apply();
         } finally {
-            Wearable.getChannelClient(this).close(channel.getToken());
+            Wearable.getChannelClient(this).close(channel);
         }
     }
 }
