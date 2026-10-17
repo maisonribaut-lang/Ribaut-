@@ -19,10 +19,21 @@ android {
             minifyEnabled false
         }
     }
+
+    packagingOptions {
+        resources {
+            excludes += ['META-INF/versions/9/OSGI-INF/MANIFEST.MF']
+        }
+    }
 }
 
 dependencies {
     implementation 'com.google.android.gms:play-services-wearable:20.0.1'
+    implementation('com.google.android.wearable.watchface.validator:validator-push-android:1.0.0-alpha10') {
+        exclude group: 'com.google.guava', module: 'listenablefuture'
+    }
+    implementation 'com.android.tools.build:apksig:8.11.1'
+    implementation 'org.bouncycastle:bcpkix-jdk18on:1.81'
 }
 
 tasks.register('wireWatchLink') {
