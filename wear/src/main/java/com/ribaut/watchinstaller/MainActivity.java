@@ -44,16 +44,16 @@ public class MainActivity extends Activity {
         status = new TextView(this);
         status.setText("Compagnon Watch Face Push prêt");
         status.setTextColor(Color.rgb(126, 211, 145));
-        status.setTextSize(14);
+        status.setTextSize(13);
         status.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams statusParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         statusParams.topMargin = dp(12);
         root.addView(status, statusParams);
 
         TextView info = new TextView(this);
-        info.setText("Cette application installe le cadran Ribaut validé et tente de l’activer automatiquement.");
+        info.setText("Installation et activation du cadran Ribaut validé.");
         info.setTextColor(Color.LTGRAY);
-        info.setTextSize(12);
+        info.setTextSize(11);
         info.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams infoParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         infoParams.topMargin = dp(12);
@@ -62,6 +62,7 @@ public class MainActivity extends Activity {
         setContentView(root);
 
         if (checkSelfPermission(SET_ACTIVE_PERMISSION) != PackageManager.PERMISSION_GRANTED) {
+            status.setText("Autorisation d’activation demandée…");
             requestPermissions(new String[]{SET_ACTIVE_PERMISSION}, 100);
         } else {
             activateWatchFace();
@@ -69,18 +70,19 @@ public class MainActivity extends Activity {
     }
 
     private void activateWatchFace() {
-        status.setText("Recherche du cadran Ribaut…");
+        status.setText("Installation / mise à jour du cadran…");
+        status.setTextColor(Color.WHITE);
         WatchFaceActivator.activate(this, new WatchFaceActivator.Callback() {
             @Override
             public void onActivated(String packageName, String slotId) {
-                status.setText("Cadran Ribaut activé");
+                status.setText("OK — cadran Ribaut installé et activé\nSlot : " + slotId);
                 status.setTextColor(Color.rgb(126, 211, 145));
             }
 
             @Override
             public void onError(String message) {
-                status.setText("Cadran installé — activation : " + message);
-                status.setTextColor(Color.rgb(255, 196, 92));
+                status.setText("ERREUR Watch Face Push\n" + message);
+                status.setTextColor(Color.rgb(255, 110, 110));
             }
         });
     }
@@ -90,11 +92,11 @@ public class MainActivity extends Activity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 100) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                status.setText("Autorisation accordée — activation…");
+                status.setText("Autorisation accordée — installation…");
                 activateWatchFace();
             } else {
-                status.setText("Cadran installé — activation manuelle possible");
-                status.setTextColor(Color.rgb(255, 196, 92));
+                status.setText("ERREUR — autorisation d’activation refusée");
+                status.setTextColor(Color.rgb(255, 110, 110));
             }
         }
     }
