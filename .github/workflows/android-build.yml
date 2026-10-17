@@ -40,8 +40,8 @@ jobs:
         run: |
           sed -i 's/for(SeekBar b:new SeekBar/for(SeekBar seek:new SeekBar/; s/)b.setOnSeekBarChangeListener(sl);/)seek.setOnSeekBarChangeListener(sl);/' app/src/main/java/com/ribaut/watchdesigner/MainActivity.java
 
-      - name: Build phone, watch companion and WFF APKs
-        run: gradle --no-daemon :app:assembleDebug :wear:assembleDebug :watchface:assembleDebug
+      - name: Build WFF APK first
+        run: gradle --no-daemon :watchface:assembleDebug
 
       - name: Download official Watch Face Push validator
         run: |
@@ -56,12 +56,27 @@ jobs:
             --package_name=com.ribaut.watchdesigner \
             | tee watchface-validation.txt
           test -s watchface-validation.txt
+          grep -q "Validation is successful" watchface-validation.txt
+
+      - name: Embed validated WFF into Watch 8 companion
+        run: |
+          TOKEN="$(sed -n 's/.*generated token: \([^[:space:]]*\).*/\1/p' watchface-validation.txt | head -n 1)"
+          test -n "$TOKEN"
+          mkdir -p wear/src/main/assets
+          cp watchface/build/outputs/apk/debug/watchface-debug.apk wear/src/main/assets/default_watchface.apk
+          printf '%s' "$TOKEN" > watchface-validation-token.txt
+          echo "DEFAULT_WFF_TOKEN=$TOKEN" >> "$GITHUB_ENV"
+
+      - name: Build phone and Watch 8 companion with validated default WFF
+        run: gradle --no-daemon :app:assembleDebug :wear:assembleDebug -PdefaultWatchFaceToken="$DEFAULT_WFF_TOKEN"
 
       - name: Upload WFF validation result
         uses: actions/upload-artifact@v4
         with:
           name: Ribaut-WFF-Validation
-          path: watchface-validation.txt
+          path: |
+            watchface-validation.txt
+            watchface-validation-token.txt
           if-no-files-found: error
 
       - name: Upload phone APK
