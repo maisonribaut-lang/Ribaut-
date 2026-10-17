@@ -4,6 +4,7 @@
         android:allowBackup="true"
         android:icon="@drawable/watch_launcher"
         android:roundIcon="@drawable/watch_launcher"
+        android:logo="@drawable/logo_pr"
         android:label="Ribaut Watch Designer"
         android:theme="@android:style/Theme.Material.NoActionBar">
         <activity
