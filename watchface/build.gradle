@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace 'com.ribaut.watchinstaller.watchfacepush.ribauttest'
+    namespace 'com.ribaut.watchdesigner.watchfacepush.ribauttest'
     compileSdk 36
 
     defaultConfig {
-        applicationId 'com.ribaut.watchinstaller.watchfacepush.ribauttest'
+        applicationId 'com.ribaut.watchdesigner.watchfacepush.ribauttest'
         minSdk 33
         targetSdk 36
         versionCode 1
