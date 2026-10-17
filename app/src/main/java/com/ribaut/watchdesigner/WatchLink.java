@@ -7,7 +7,7 @@ import com.google.android.gms.wearable.Wearable;
 import java.nio.charset.StandardCharsets;
 
 public final class WatchLink {
-    private static final String PATH = "/ribaut/watchdesigner/ping";
+    private static final String INSTALL_PATH = "/ribaut/watchdesigner/install-default";
     private WatchLink() {}
 
     public static void test(Activity activity) {
@@ -18,10 +18,10 @@ public final class WatchLink {
                     return;
                 }
                 Node node = nodes.get(0);
-                byte[] data = "RIBAUT_WATCH_DESIGNER_V1".getBytes(StandardCharsets.UTF_8);
-                Wearable.getMessageClient(activity).sendMessage(node.getId(), PATH, data)
-                    .addOnSuccessListener(id -> show(activity, "Watch 8 détectée", "La liaison téléphone → montre fonctionne avec « " + node.getDisplayName() + " ».\n\nLa prochaine étape est l'envoi du cadran Watch Face Format."))
-                    .addOnFailureListener(e -> show(activity, "Échec de liaison", "La montre est détectée mais le message n'a pas pu être envoyé.\n\n" + e.getMessage()));
+                byte[] data = "INSTALL_RIBAUT_WFF".getBytes(StandardCharsets.UTF_8);
+                Wearable.getMessageClient(activity).sendMessage(node.getId(), INSTALL_PATH, data)
+                    .addOnSuccessListener(id -> show(activity, "Envoi vers la Watch 8", "La demande d'installation du cadran Ribaut a été envoyée à « " + node.getDisplayName() + " ».\n\nRegarde maintenant la montre : le compagnon va rechercher le cadran WFF validé et tenter de l'activer."))
+                    .addOnFailureListener(e -> show(activity, "Échec d'envoi", "La montre est détectée mais la demande d'installation n'a pas pu être envoyée.\n\n" + e.getMessage()));
             })
             .addOnFailureListener(e -> show(activity, "Échec Wear OS", "Impossible d'interroger la montre.\n\n" + e.getMessage()));
     }
