@@ -3,6 +3,7 @@ plugins {
 }
 
 android {
+    enableKotlin = false
     namespace 'com.ribaut.watchdesigner.watchfacepush.ribauttest'
     compileSdk 36
 
@@ -15,7 +16,13 @@ android {
     }
 
     buildTypes {
-        debug { minifyEnabled false }
-        release { minifyEnabled false }
+        debug {
+            minifyEnabled true
+        }
+        release {
+            minifyEnabled true
+            shrinkResources false
+            signingConfig signingConfigs.debug
+        }
     }
 }
