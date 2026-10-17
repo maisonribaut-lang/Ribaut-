@@ -26,33 +26,39 @@ object WatchFaceActivator {
             callback.onError("Préparation du cadran : ${e.message ?: e.javaClass.simpleName}")
             return
         }
-        installFile(context, apk, DEFAULT_WATCH_FACE_PACKAGE, callback)
+        val info = app.packageManager.getApplicationInfo(app.packageName, PackageManager.GET_META_DATA)
+        val token = info.metaData?.getString(TOKEN_META)
+        if (token.isNullOrBlank()) {
+            callback.onError("Jeton WFF par défaut absent")
+            return
+        }
+        installFile(context, apk, DEFAULT_WATCH_FACE_PACKAGE, token, callback)
     }
 
     @JvmStatic
-    fun installReceived(context: Context, apk: File, packageName: String, callback: Callback) {
+    fun installReceived(context: Context, apk: File, packageName: String, validationToken: String, callback: Callback) {
         if (!apk.isFile || apk.length() == 0L) {
             callback.onError("Fichier de cadran reçu absent ou vide")
             return
         }
-        installFile(context, apk, packageName, callback)
+        if (validationToken.isBlank()) {
+            callback.onError("Jeton de validation du cadran reçu absent")
+            return
+        }
+        installFile(context, apk, packageName, validationToken, callback)
     }
 
-    private fun installFile(context: Context, apk: File, packageName: String, callback: Callback) {
+    private fun installFile(context: Context, apk: File, packageName: String, validationToken: String, callback: Callback) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val app = context.applicationContext
                 val manager = WatchFacePushManagerFactory.createWatchFacePushManager(app)
-                val info = app.packageManager.getApplicationInfo(app.packageName, PackageManager.GET_META_DATA)
-                val token = info.metaData?.getString(TOKEN_META)
-                    ?: throw IllegalStateException("Jeton WFF absent")
-
                 val current = manager.listWatchFaces()
                 val existing = current.installedWatchFaceDetails.firstOrNull { it.packageName == packageName }
                 val slotId = ParcelFileDescriptor.open(apk, ParcelFileDescriptor.MODE_READ_ONLY).use { pfd ->
-                    if (existing == null) manager.addWatchFace(pfd, token).slotId
+                    if (existing == null) manager.addWatchFace(pfd, validationToken).slotId
                     else {
-                        manager.updateWatchFace(existing.slotId, pfd, token)
+                        manager.updateWatchFace(existing.slotId, pfd, validationToken)
                         existing.slotId
                     }
                 }
