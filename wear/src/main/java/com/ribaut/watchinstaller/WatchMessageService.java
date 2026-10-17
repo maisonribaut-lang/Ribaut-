@@ -11,6 +11,7 @@ import java.io.InputStream;
 
 public class WatchMessageService extends WearableListenerService {
     public static final String PATH = "/ribaut/watchdesigner/ping";
+    public static final String INSTALL_PATH = "/ribaut/watchdesigner/install-default";
     public static final String CHANNEL_PATH = "/ribaut/watchdesigner/watchface-apk";
     public static final String ACTION_LINK_OK = "com.ribaut.watchinstaller.LINK_OK";
     public static final String ACTION_WFF_RECEIVED = "com.ribaut.watchinstaller.WFF_RECEIVED";
@@ -23,6 +24,28 @@ public class WatchMessageService extends WearableListenerService {
             Intent i = new Intent(ACTION_LINK_OK);
             i.setPackage(getPackageName());
             sendBroadcast(i);
+            return;
+        }
+        if (INSTALL_PATH.equals(event.getPath())) {
+            getSharedPreferences("ribaut_watch_link", MODE_PRIVATE).edit()
+                .putLong("last_install_request", System.currentTimeMillis()).apply();
+            WatchFaceActivator.activate(this, new WatchFaceActivator.Callback() {
+                @Override
+                public void onActivated(String packageName, String slotId) {
+                    getSharedPreferences("ribaut_watch_link", MODE_PRIVATE).edit()
+                        .putString("last_install_status", "activated")
+                        .putString("last_watchface_package", packageName)
+                        .apply();
+                }
+
+                @Override
+                public void onError(String message) {
+                    getSharedPreferences("ribaut_watch_link", MODE_PRIVATE).edit()
+                        .putString("last_install_status", "error")
+                        .putString("last_install_error", message)
+                        .apply();
+                }
+            });
         }
     }
 
