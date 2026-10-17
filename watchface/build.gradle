@@ -3,7 +3,6 @@ plugins {
 }
 
 android {
-    enableKotlin = false
     namespace 'com.ribaut.watchdesigner.watchfacepush.ribauttest'
     compileSdk 36
 
