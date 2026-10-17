@@ -11,6 +11,9 @@
 
         <uses-library android:name="com.google.android.wearable" android:required="true" />
         <meta-data android:name="com.google.android.wearable.standalone" android:value="false" />
+        <meta-data
+            android:name="com.google.android.wearable.marketplace.DEFAULT_WATCHFACE_VALIDATION_TOKEN"
+            android:value="${defaultWatchFaceToken}" />
 
         <service
             android:name=".WatchMessageService"
