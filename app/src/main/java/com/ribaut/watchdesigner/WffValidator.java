@@ -12,17 +12,22 @@ public final class WffValidator {
             return Result.error("APK WFF absent ou vide");
         }
         try {
-            var validator = DwfValidatorFactory.create();
-            var validation = validator.validate(apk, marketplacePackage);
-            if (!validation.failures().isEmpty()) {
-                StringBuilder details = new StringBuilder();
-                for (var failure : validation.failures()) {
-                    if (details.length() > 0) details.append("\n");
-                    details.append(failure.name()).append(": ").append(failure.failureMessage());
-                }
-                return Result.error(details.toString());
+            Object validator = DwfValidatorFactory.create();
+            java.lang.reflect.Method validate = validator.getClass().getMethod("validate", File.class, String.class);
+            Object validation = validate.invoke(validator, apk, marketplacePackage);
+            java.lang.reflect.Method failuresMethod = validation.getClass().getMethod("failures");
+            Iterable<?> failures = (Iterable<?>) failuresMethod.invoke(validation);
+            StringBuilder details = new StringBuilder();
+            for (Object failure : failures) {
+                if (details.length() > 0) details.append("\n");
+                java.lang.reflect.Method name = failure.getClass().getMethod("name");
+                java.lang.reflect.Method message = failure.getClass().getMethod("failureMessage");
+                details.append(String.valueOf(name.invoke(failure))).append(": ")
+                        .append(String.valueOf(message.invoke(failure)));
             }
-            return Result.ok(validation.validationToken());
+            if (details.length() > 0) return Result.error(details.toString());
+            java.lang.reflect.Method tokenMethod = validation.getClass().getMethod("validationToken");
+            return Result.ok(String.valueOf(tokenMethod.invoke(validation)));
         } catch (Throwable t) {
             return Result.error(t.getClass().getSimpleName() + ": " + String.valueOf(t.getMessage()));
         }
