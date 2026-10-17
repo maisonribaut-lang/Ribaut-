@@ -43,6 +43,27 @@ jobs:
       - name: Build phone, watch companion and WFF APKs
         run: gradle --no-daemon :app:assembleDebug :wear:assembleDebug :watchface:assembleDebug
 
+      - name: Download official Watch Face Push validator
+        run: |
+          curl --fail --location --retry 3 \
+            -o validator-push-cli.jar \
+            "https://dl.google.com/dl/android/maven2/com/google/android/wearable/watchface/validator/validator-push-cli/1.0.0-alpha10/validator-push-cli-1.0.0-alpha10.jar"
+
+      - name: Validate WFF and generate validation token
+        run: |
+          java -jar validator-push-cli.jar \
+            --apk_path=watchface/build/outputs/apk/debug/watchface-debug.apk \
+            --package_name=com.ribaut.watchdesigner \
+            | tee watchface-validation.txt
+          test -s watchface-validation.txt
+
+      - name: Upload WFF validation result
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ribaut-WFF-Validation
+          path: watchface-validation.txt
+          if-no-files-found: error
+
       - name: Upload phone APK
         uses: actions/upload-artifact@v4
         with:
