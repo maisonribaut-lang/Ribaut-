@@ -8,10 +8,12 @@ import com.google.android.gms.wearable.WearableListenerService;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 public class WatchMessageService extends WearableListenerService {
     public static final String PATH = "/ribaut/watchdesigner/ping";
     public static final String INSTALL_PATH = "/ribaut/watchdesigner/install-default";
+    public static final String TOKEN_PATH = "/ribaut/watchdesigner/watchface-token";
     public static final String CHANNEL_PATH = "/ribaut/watchdesigner/watchface-apk";
     public static final String ACTION_LINK_OK = "com.ribaut.watchinstaller.LINK_OK";
     public static final String ACTION_WFF_RECEIVED = "com.ribaut.watchinstaller.WFF_RECEIVED";
@@ -25,6 +27,14 @@ public class WatchMessageService extends WearableListenerService {
             Intent i = new Intent(ACTION_LINK_OK);
             i.setPackage(getPackageName());
             sendBroadcast(i);
+            return;
+        }
+        if (TOKEN_PATH.equals(event.getPath())) {
+            String token = new String(event.getData(), StandardCharsets.UTF_8).trim();
+            getSharedPreferences("ribaut_watch_link", MODE_PRIVATE).edit()
+                .putString("incoming_wff_token", token)
+                .putLong("incoming_wff_token_time", System.currentTimeMillis())
+                .apply();
             return;
         }
         if (INSTALL_PATH.equals(event.getPath())) {
@@ -81,6 +91,12 @@ public class WatchMessageService extends WearableListenerService {
             out.flush();
             if (target.length() == 0L) throw new IllegalStateException("APK reçu vide");
 
+            String token = getSharedPreferences("ribaut_watch_link", MODE_PRIVATE)
+                .getString("incoming_wff_token", "");
+            if (token == null || token.trim().isEmpty()) {
+                throw new IllegalStateException("Jeton de validation du cadran non reçu");
+            }
+
             getSharedPreferences("ribaut_watch_link", MODE_PRIVATE).edit()
                 .putString("incoming_wff", target.getAbsolutePath())
                 .putLong("incoming_wff_time", System.currentTimeMillis())
@@ -88,7 +104,7 @@ public class WatchMessageService extends WearableListenerService {
                 .remove("incoming_wff_error")
                 .apply();
 
-            WatchFaceActivator.installReceived(this, target, CUSTOM_WFF_PACKAGE, resultCallback());
+            WatchFaceActivator.installReceived(this, target, CUSTOM_WFF_PACKAGE, token, resultCallback());
 
             Intent i = new Intent(ACTION_WFF_RECEIVED);
             i.setPackage(getPackageName());
